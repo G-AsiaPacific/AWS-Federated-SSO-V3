@@ -27,6 +27,7 @@ This script automates the setup for AWS Federated Single Sign-On (SSO) by creati
 4. **Enter the Secret Word**: When prompted, enter the secret word. You have two attempts to enter it correctly.
 
 **Follow Prompts**: The script will ask you to decide whether it's a PMA or a Root Account or Billing Transfer. Make your selection according to your AWS account setup.
+
 5. **Choose Account Type**: Select your account type:
    - AWS Root Account (RA)
    - AWS PMA Account
