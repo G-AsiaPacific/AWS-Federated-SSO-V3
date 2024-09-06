@@ -233,8 +233,8 @@ check_type_account() {
     read -p "Enter your account type (0 - 2): " choose_type_account
     case $choose_type_account in
         0) create_idp; create_iam_role; check_region; delete_default_vpcs ;;
-        1) create_idp; create_iam_role; check_region ;;
-        2) create_idp; create_iam_role; check_region; pma_enable_org ;;
+        1) create_idp; create_iam_role; check_region; pma_enable_org ;;
+        2) create_idp; create_iam_role; check_region ;;
         *) echo 'Sorry, try again' >&2 ;;
     esac
     echo 'Below are the roles for SSO roles registration (Please update on AWS Account & Server Information):'
