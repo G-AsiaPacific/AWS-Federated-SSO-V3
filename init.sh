@@ -258,8 +258,8 @@ check_type_account() {
     read -p "Enter your account type (1 - 3): " choose_type_account
     case $choose_type_account in
         1) create_idp; create_iam_role; check_region; display_and_push_roles; delete_default_vpcs ;;
-        2) create_idp; create_iam_role; check_region; display_and_push_roles ;;
-        3) create_idp; create_iam_role; check_region; pma_enable_org; display_and_push_roles ;;
+        2) create_idp; create_iam_role; check_region; pma_enable_org; display_and_push_roles ;;
+        3) create_idp; create_iam_role; check_region; display_and_push_roles ;;
         *) echo 'Sorry, try again' >&2 ;;
     esac
 }
