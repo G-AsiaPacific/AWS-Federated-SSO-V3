@@ -259,7 +259,6 @@ check_region() {
     esac
 }
 
-<<<<<<< HEAD
 check_type_account() {
     echo "Choose your account type:"
     echo "[0] AWS Child Account (RA) *deletes all region default VPCs"
@@ -272,10 +271,10 @@ check_type_account() {
         2) create_idp; update_role_pma_trusted; create_iam_role; check_region; enable_my_region ;;
         *) echo 'Sorry, try again' >&2 ;;
     esac
-=======
+}
+
 display_and_push_roles() {
->>>>>>> a2356d751f30579443099b1c46c34816b92b8909
-    echo 'Below are the roles for SSO roles registration (Please update on AWS Account & Server Information):'
+    echo "Below are the roles for SSO roles registration (Please update on AWS Account & Server Information):"
     if [ $choose_type_account -eq 2 ]; then
         echo Technical Role ARN: ${TECH_ROLE_ARN//\"/}
         echo Billing Role ARN: ${BILLING_ROLE_ARN//\"/}
