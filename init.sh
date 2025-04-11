@@ -259,6 +259,7 @@ check_region() {
     esac
 }
 
+<<<<<<< HEAD
 check_type_account() {
     echo "Choose your account type:"
     echo "[0] AWS Child Account (RA) *deletes all region default VPCs"
@@ -271,8 +272,11 @@ check_type_account() {
         2) create_idp; update_role_pma_trusted; create_iam_role; check_region; enable_my_region ;;
         *) echo 'Sorry, try again' >&2 ;;
     esac
+=======
+display_and_push_roles() {
+>>>>>>> a2356d751f30579443099b1c46c34816b92b8909
     echo 'Below are the roles for SSO roles registration (Please update on AWS Account & Server Information):'
-    if [ $choose_type_account -eq 1 ]; then
+    if [ $choose_type_account -eq 2 ]; then
         echo Technical Role ARN: ${TECH_ROLE_ARN//\"/}
         echo Billing Role ARN: ${BILLING_ROLE_ARN//\"/}
         echo Read Only Role ARN: ${READONLY_ROLE_ARN//\"/}
@@ -293,6 +297,20 @@ check_type_account() {
         push_role_sso ${BILLING_ROLE_ARN//\"/}','${IDP_ARN//\"/} "\nBilling Role for $CUSTOMER_NAME_FOR_DESCRIPTION $ACCOUNT_REGION"
         push_role_sso ${READONLY_ROLE_ARN//\"/}','${IDP_ARN//\"/} "\nReadOnly Role for $CUSTOMER_NAME_FOR_DESCRIPTION $ACCOUNT_REGION"
     fi
+}
+
+check_type_account() {
+    echo "Choose your account type:"
+    echo "[1] AWS Root Account (RA)"
+    echo "[2] AWS PMA Account"
+    echo "[3] AWS Billing Transfer Account"
+    read -p "Enter your account type (1 - 3): " choose_type_account
+    case $choose_type_account in
+        1) create_idp; create_iam_role; check_region; display_and_push_roles; delete_default_vpcs ;;
+        2) create_idp; create_iam_role; check_region; pma_enable_org; display_and_push_roles ;;
+        3) create_idp; create_iam_role; check_region; display_and_push_roles ;;
+        *) echo 'Sorry, try again' >&2 ;;
+    esac
 }
 
 main() {
