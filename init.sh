@@ -20,7 +20,7 @@ get_super_super_secret() {
             exit 1
         fi
     elif [ "$http_code" -eq 403 ] || [ "$http_code" -ne 200 ]; then
-        echo "Cannot proceed: The value is not correct (HTTP code: $http_code)"
+        echo "❌ Cannot proceed: The value is not correct (HTTP code: $http_code)"
         exit 1
     fi
 }
@@ -54,9 +54,9 @@ delete_default_vpcs() {
             # Delete the VPC
             aws ec2 delete-vpc --region $region --vpc-id $default_vpc_id
             
-            echo "Default VPC $default_vpc_id in region $region has been deleted."
+            echo "✅ Default VPC $default_vpc_id in region $region has been deleted."
         else
-            echo "No default VPC found in region $region."
+            echo "❌ No default VPC found in region $region."
         fi
     done
 }
@@ -81,12 +81,12 @@ enable_my_region() {
                     break
                 fi
 
-                echo "⏳ Still waiting... checking again in 10 seconds."
-                sleep 10
+                echo "⏳ Still waiting... checking again in 30 seconds."
+                sleep 30
             done
             ;;
         n|N)
-            echo "❌ Won't proceed to enable MY region."
+            echo "❌ won't proceed to enable MY region."
             ;;
         *)
             echo "⚠️ Invalid input. Try again!"
@@ -108,9 +108,9 @@ pma_enable_org() {
     case $check_create_org in
         y) aws organizations create-organization && aws organizations enable-aws-service-access --service-principal reachabilityanalyzer.networkinsights.amazonaws.com;;
         Y) aws organizations create-organization && aws organizations enable-aws-service-access --service-principal reachabilityanalyzer.networkinsights.amazonaws.com;;
-        n) echo "won't Proceed to create organization";;
-        N) echo "won't Proceed to create organization";;
-        *) echo "Invalid input. Try again!"
+        n) echo "❌ won't proceed to create organization";;
+        N) echo "❌ won't proceed to create organization";;
+        *) echo "⚠️ Invalid input. Try again!"
     esac
     
 }
@@ -131,16 +131,16 @@ create_iam_role() {
         echo "Customer Name (without space) - *If PMA then starts with 'PMA-CustomerName' else 'CustomerName':"
         read CUSTOMER_NAME_INPUT
         if [ -z "$CUSTOMER_NAME_INPUT" ]; then
-            echo 'Inputs cannot be blank, please try again!'
+            echo '⚠️ Inputs cannot be blank, please try again!'
         elif [[ "$CUSTOMER_NAME_INPUT" == *" "* ]]; then
             CUSTOMER_NAME_INPUT=${CUSTOMER_NAME_INPUT// /-}
-            echo "Input contains spaces. Replaced spaces with '-': $CUSTOMER_NAME_INPUT"
+            echo "⚠️ Input contains spaces. Replaced spaces with '-': $CUSTOMER_NAME_INPUT"
             echo "Do you agree with this change? (yes/NO)"
             read AGREEMENT
             if [[ "$AGREEMENT" =~ ^(yes|YES|y|Y)$ ]]; then
                 break
             else
-                echo "Please enter the Customer Name again without spaces."
+                echo "⚠️ Please enter the Customer Name again without spaces."
             fi
         else
             break
@@ -204,8 +204,9 @@ EOL
     if [ $? -ne 0 ]; then
         echo "Role '$Tech_ROLE_NAME' does not exist. Creating a new role..."
         TECH_ROLE_ARN=$(aws iam create-role --role-name $Tech_ROLE_NAME --assume-role-policy-document file://$TRUST_RELATIONSHIP_FILE --query 'Role.Arn' --max-session-duration 43200)
+        echo "✅ Role '$Tech_ROLE_NAME' is created..."
     else
-        echo "Role '$Tech_ROLE_NAME' already exists. Updating its Trust Relationship to utilize GAPSSO2..."
+        echo "⚠️ Role '$Tech_ROLE_NAME' already exists. Updating its Trust Relationship to utilize GAPSSO2..."
         aws iam update-assume-role-policy --role-name $Tech_ROLE_NAME --policy-document file://$TRUST_RELATIONSHIP_FILE --query 'Role.Arn'
         aws iam update-role --role-name $Tech_ROLE_NAME --max-session-duration 43200
         TECH_ROLE_ARN="arn:aws:iam::"$ACCOUNT_ID":role/"$Tech_ROLE_NAME
@@ -215,8 +216,9 @@ EOL
     if [ $? -ne 0 ]; then
         echo "Role '$Billing_ROLE_NAME' does not exist. Creating a new role..."
         BILLING_ROLE_ARN=$(aws iam create-role --role-name $Billing_ROLE_NAME --assume-role-policy-document file://$TRUST_RELATIONSHIP_FILE --query 'Role.Arn')
+        echo "✅ Role '$Billing_ROLE_NAME' is created..."
     else
-        echo "Role '$Billing_ROLE_NAME' already exists. Updating its Trust Relationship to utilize GAPSSO2..."
+        echo "⚠️ Role '$Billing_ROLE_NAME' already exists. Updating its Trust Relationship to utilize GAPSSO2..."
         aws iam update-assume-role-policy --role-name $Billing_ROLE_NAME --policy-document file://$TRUST_RELATIONSHIP_FILE --query 'Role.Arn'
         BILLING_ROLE_ARN="arn:aws:iam::"$ACCOUNT_ID":role/"$Billing_ROLE_NAME
     fi
@@ -225,8 +227,9 @@ EOL
     if [ $? -ne 0 ]; then
         echo "Role '$ReadOnly_ROLE_NAME' does not exist. Creating a new role..."
         READONLY_ROLE_ARN=$(aws iam create-role --role-name $ReadOnly_ROLE_NAME --assume-role-policy-document file://$TRUST_RELATIONSHIP_FILE --query 'Role.Arn')
+        echo "✅ Role '$ReadOnly_ROLE_NAME' is created..."
     else
-        echo "Role '$ReadOnly_ROLE_NAME' already exists. Updating its Trust Relationship to utilize GAPSSO2..."
+        echo "⚠️ Role '$ReadOnly_ROLE_NAME' already exists. Updating its Trust Relationship to utilize GAPSSO2..."
         aws iam update-assume-role-policy --role-name $ReadOnly_ROLE_NAME --policy-document file://$TRUST_RELATIONSHIP_FILE --query 'Role.Arn'
         READONLY_ROLE_ARN="arn:aws:iam::"$ACCOUNT_ID":role/"$ReadOnly_ROLE_NAME
     fi
@@ -255,7 +258,7 @@ check_region() {
         1) ACCOUNT_REGION="Singapore";;
         2) ACCOUNT_REGION="Indonesia";;
         3) ACCOUNT_REGION="Vietnam";;
-        *) echo "Invalid input. Try again!"
+        *) echo "⚠️ Invalid input. Try again!"
     esac
 }
 
@@ -294,7 +297,7 @@ check_type_account() {
         0) create_idp; create_iam_role; check_region; enable_my_region; display_and_push_roles; delete_default_vpcs ;;
         1) create_idp; create_iam_role; check_region; pma_enable_org; enable_my_region; display_and_push_roles ;;
         2) create_idp; create_iam_role; check_region; enable_my_region; display_and_push_roles ;;
-        *) echo 'Sorry, try again' >&2 ;;
+        *) echo '⚠️ Invalid input. Try again!' >&2 ;;
     esac
 }
 
@@ -306,7 +309,7 @@ main() {
                 break
             fi
             if [ $i -eq 2 ]; then
-                echo "No input provided. Exiting."
+                echo "⚠️ No input provided. Exiting."
                 exit 1
             fi
         done
