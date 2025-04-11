@@ -61,6 +61,40 @@ delete_default_vpcs() {
     done
 }
 
+enable_my_region() {
+    AWS_REGION_MY="ap-southeast-5"
+
+    echo "Enable MY Region?"
+    read -p "Enter your choice (Y/N): " check_enable_region
+
+    case $check_enable_region in
+        y|Y)
+            echo "Enabling region: $AWS_REGION_MY..."
+            aws account enable-region --region-name "$AWS_REGION_MY"
+            echo "Waiting for region to become ENABLED..."
+            while true; do
+                STATUS=$(aws account get-region-opt-status --region-name "$AWS_REGION_MY" --query 'RegionOptStatus' --output text)
+                echo "Current status: $STATUS"
+
+                if [[ "$STATUS" == "ENABLED" ]]; then
+                    echo "✅ Region $AWS_REGION_MY is now ENABLED!"
+                    break
+                fi
+
+                echo "⏳ Still waiting... checking again in 10 seconds."
+                sleep 10
+            done
+            ;;
+        n|N)
+            echo "❌ Won't proceed to enable MY region."
+            ;;
+        *)
+            echo "⚠️ Invalid input. Try again!"
+            ;;
+    esac
+
+}
+
 create_idp() {
     PROVIDER_NAME="GAPSSO2"
     METADATA_FILE="GAPSSO2.xml"
@@ -227,14 +261,14 @@ check_region() {
 
 check_type_account() {
     echo "Choose your account type:"
-    echo "[0] AWS Root Account (RA)"
-    echo "[1] AWS PMA Account"
-    echo "[2] AWS Billing Transfer Account"
+    echo "[0] AWS Child Account (RA) *deletes all region default VPCs"
+    echo "[1] AWS PMA Account (PMA)"
+    echo "[2] AWS Billing Transfer Child Account (RA)"
     read -p "Enter your account type (0 - 2): " choose_type_account
     case $choose_type_account in
-        0) create_idp; create_iam_role; check_region; delete_default_vpcs ;;
-        1) create_idp; create_iam_role; check_region; pma_enable_org ;;
-        2) create_idp; create_iam_role; check_region ;;
+        0) create_idp; update_role_pma_trusted; create_iam_role; check_region; enable_my_region; delete_default_vpcs ;;
+        1) create_idp; create_iam_role; check_region; enable_my_region; pma_enable_org ;;
+        2) create_idp; update_role_pma_trusted; create_iam_role; check_region; enable_my_region ;;
         *) echo 'Sorry, try again' >&2 ;;
     esac
     echo 'Below are the roles for SSO roles registration (Please update on AWS Account & Server Information):'
