@@ -291,9 +291,9 @@ check_type_account() {
     echo "[2] AWS Billing Transfer Child Account (RA)"
     read -p "Enter your account type (0 - 2): " choose_type_account
     case $choose_type_account in
-        1) create_idp; create_iam_role; check_region; display_and_push_roles; enable_my_region; delete_default_vpcs ;;
-        2) create_idp; create_iam_role; check_region; pma_enable_org; display_and_push_roles; enable_my_region ;;
-        3) create_idp; create_iam_role; check_region; display_and_push_roles; enable_my_region ;;
+        0) create_idp; create_iam_role; check_region; enable_my_region; display_and_push_roles; delete_default_vpcs ;;
+        1) create_idp; create_iam_role; check_region; pma_enable_org; enable_my_region; display_and_push_roles ;;
+        2) create_idp; create_iam_role; check_region; enable_my_region; display_and_push_roles ;;
         *) echo 'Sorry, try again' >&2 ;;
     esac
 }
